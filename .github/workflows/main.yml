@@ -1,0 +1,34 @@
+name: Azure Web App Deployment
+
+on:
+  push:
+    branches:
+      - main  # Change this to the branch you want to trigger the deployment on
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Azure CLI
+      run: |
+        curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      if: success()
+
+    - name: Configure Azure credentials
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Deploy to Azure Web App
+      run: |
+        az webapp deployment source config-zip \
+          --resource-group siliconrg \
+          --name valleywebapp21 \
+          --src ./test.zip
+      working-directory: ${{ github.workspace }}
+
+# Make sure to replace YourResourceGroupName and YourWebAppName with the actual values.
